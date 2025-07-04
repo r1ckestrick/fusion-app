@@ -378,7 +378,6 @@
     </div>
     <script src="{{ url_for('static', filename='js/app.js') }}"></script>
     <script>
-        // Forzar autoplay en móviles
         document.addEventListener('DOMContentLoaded', function() {
             var video = document.getElementById('bgVideo');
             if (video) {
@@ -386,18 +385,27 @@
                 video.playsInline = true;
                 video.autoplay = true;
                 video.loop = true;
-                // iOS hack: play after user interaction if needed
-                var playPromise = video.play();
-                if (playPromise !== undefined) {
-                    playPromise.catch(function() {
-                        var startBtn = document.getElementById('startBtn');
-                        if (startBtn) {
-                            startBtn.addEventListener('click', function() {
+
+                function tryPlay() {
+                    var playPromise = video.play();
+                    if (playPromise !== undefined) {
+                        playPromise.catch(function() {
+                            // Si falla, esperar interacción
+                            var startBtn = document.getElementById('startBtn');
+                            if (startBtn) {
+                                startBtn.addEventListener('click', function() {
+                                    video.play();
+                                }, { once: true });
+                            }
+                            // Además, cualquier toque en pantalla
+                            document.body.addEventListener('touchstart', function oncePlay() {
                                 video.play();
+                                document.body.removeEventListener('touchstart', oncePlay);
                             }, { once: true });
-                        }
-                    });
+                        });
+                    }
                 }
+                tryPlay();
             }
         });
     </script>
