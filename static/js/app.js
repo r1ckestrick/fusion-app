@@ -10,15 +10,9 @@ document.addEventListener('DOMContentLoaded', function() {
     const landingScreen = document.getElementById('landingScreen');
     const formContainer = document.getElementById('formContainer');
     
-    // Elementos para la cámara
-    const video = document.getElementById('video');
-    const takePhotoBtn = document.getElementById('takePhotoBtn');
+    // Preview
     const preview = document.getElementById('preview');
     const previewImg = document.getElementById('previewImg');
-    
-    // Variables para controlar la cámara
-    let currentStream = null;
-    let facingMode = 'user'; // 'user' para frontal, 'environment' para trasera
     
     // Crear input file real
     const fileInput = document.createElement('input');
@@ -33,44 +27,10 @@ document.addEventListener('DOMContentLoaded', function() {
     startBtn.addEventListener('click', function() {
         landingScreen.classList.add('hide');
         formContainer.classList.add('show');
-        startCamera('user'); // Iniciar con cámara frontal por defecto
+        setTimeout(() => {
+            fileInput.click();
+        }, 400);
     });
-
-    // Funcionalidad de la cámara
-    function startCamera(facing = 'user') {
-        if (currentStream) {
-            currentStream.getTracks().forEach(track => track.stop());
-        }
-        if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-            const constraints = {
-                video: {
-                    facingMode: facing
-                }
-            };
-            navigator.mediaDevices.getUserMedia(constraints)
-                .then(function(stream) {
-                    currentStream = stream;
-                    video.srcObject = stream;
-                    video.style.display = 'block';
-                    preview.style.display = 'none';
-                    resultContainer.style.display = 'none';
-                    takePhotoBtn.style.display = 'block';
-                    facingMode = facing;
-                })
-                .catch(function(error) {
-                    console.error('Error accediendo a la cámara:', error);
-                    // Si falla la cámara, abrir el popup de archivo
-                    setTimeout(() => {
-                        fileInput.click();
-                    }, 400);
-                });
-        } else {
-            // Si no hay soporte, abrir el popup de archivo
-            setTimeout(() => {
-                fileInput.click();
-            }, 400);
-        }
-    }
 
     // Manejar selección de archivo
     fileInput.addEventListener('change', function(e) {
@@ -78,9 +38,6 @@ document.addEventListener('DOMContentLoaded', function() {
         if (file) {
             const reader = new FileReader();
             reader.onload = function(e) {
-                // Ocultar video y botón de foto, mostrar preview
-                video.style.display = 'none';
-                takePhotoBtn.style.display = 'none';
                 previewImg.src = e.target.result;
                 preview.style.display = 'block';
                 btn.style.display = 'block';
@@ -92,76 +49,40 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    // Funcionalidad de tomar foto
-    takePhotoBtn.addEventListener('click', function() {
-        const canvas = document.createElement('canvas');
-        canvas.width = video.videoWidth;
-        canvas.height = video.videoHeight;
-        const ctx = canvas.getContext('2d');
-        ctx.drawImage(video, 0, 0);
-        
-        canvas.toBlob(function(blob) {
-            const file = new File([blob], 'photo.png', { type: 'image/png' });
-            const dataTransfer = new DataTransfer();
-            dataTransfer.items.add(file);
-            fileInput.files = dataTransfer.files;
-            
-            // Ocultar video y botón de foto, mostrar preview
-            const photoData = canvas.toDataURL('image/png');
-            video.style.display = 'none';
-            takePhotoBtn.style.display = 'none';
-            // Mostrar controles de cámara para permitir cambiar
-            document.querySelector('.camera-controls').style.display = 'flex';
-            previewImg.src = photoData;
-            preview.style.display = 'block';
-            btn.style.display = 'block';
-            btn.disabled = false;
-            resultContainer.style.display = 'none';
-            shareBtn.style.display = 'none';
-        }, 'image/png');
-    });
-
     // Funcionalidad del formulario
     form.addEventListener('submit', async function(e) {
         e.preventDefault();
-        
         if (!fileInput.files || fileInput.files.length === 0) {
             alert('Por favor selecciona una imagen primero');
             return;
         }
-        
         btn.textContent = 'Procesando...';
         btn.disabled = true;
-        
         const formData = new FormData(this);
         try {
             const response = await fetch('/', {
                 method: 'POST',
                 body: formData
             });
-            
             const result = await response.json();
             if (result.success) {
-                // Ocultar preview y botón de foto, mostrar resultado en el mismo marco
                 preview.style.display = 'none';
-                takePhotoBtn.style.display = 'none';
                 resultImage.src = result.image_path;
                 resultContainer.style.display = 'block';
                 btn.textContent = 'Compartir';
                 btn.disabled = false;
                 btn.style.display = 'none';
                 shareBtn.style.display = 'block';
-                // Mostrar el botón de trailer
                 document.getElementById('trailer-btn').style.display = 'block';
             } else {
                 alert('Error: ' + (result.error || 'Error desconocido'));
-                btn.textContent = 'DESCUBRIR MI AMOR ETERNO';
+                btn.textContent = 'DESCUBRIR EL AMOR PARA SIEMPRE';
                 btn.disabled = false;
             }
         } catch (error) {
             console.error('Error:', error);
             alert('Error al procesar la imagen');
-            btn.textContent = 'DESCUBRIR MI AMOR ETERNO';
+            btn.textContent = 'DESCUBRIR EL AMOR PARA SIEMPRE';
             btn.disabled = false;
         }
     });
