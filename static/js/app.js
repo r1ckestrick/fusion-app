@@ -16,10 +16,15 @@ document.addEventListener('DOMContentLoaded', function() {
     const preview = document.getElementById('preview');
     const previewImg = document.getElementById('previewImg');
     
+    // Variables para controlar la cámara
+    let currentStream = null;
+    let facingMode = 'user'; // 'user' para frontal, 'environment' para trasera
+    
     // Crear input file real
     const fileInput = document.createElement('input');
     fileInput.type = 'file';
     fileInput.accept = 'image/*';
+    fileInput.setAttribute('capture', 'environment'); // o 'user' para cámara frontal
     fileInput.name = 'image';
     fileInput.style.display = 'none';
     form.appendChild(fileInput);
@@ -28,31 +33,43 @@ document.addEventListener('DOMContentLoaded', function() {
     startBtn.addEventListener('click', function() {
         landingScreen.classList.add('hide');
         formContainer.classList.add('show');
-        startCamera();
+        startCamera('user'); // Iniciar con cámara frontal por defecto
     });
 
     // Funcionalidad de la cámara
-    function startCamera() {
+    function startCamera(facing = 'user') {
+        if (currentStream) {
+            currentStream.getTracks().forEach(track => track.stop());
+        }
         if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-            navigator.mediaDevices.getUserMedia({ video: true })
+            const constraints = {
+                video: {
+                    facingMode: facing
+                }
+            };
+            navigator.mediaDevices.getUserMedia(constraints)
                 .then(function(stream) {
+                    currentStream = stream;
                     video.srcObject = stream;
                     video.style.display = 'block';
                     preview.style.display = 'none';
                     resultContainer.style.display = 'none';
                     takePhotoBtn.style.display = 'block';
+                    facingMode = facing;
                 })
                 .catch(function(error) {
                     console.error('Error accediendo a la cámara:', error);
-                    showFileInput();
+                    // Si falla la cámara, abrir el popup de archivo
+                    setTimeout(() => {
+                        fileInput.click();
+                    }, 400);
                 });
         } else {
-            showFileInput();
+            // Si no hay soporte, abrir el popup de archivo
+            setTimeout(() => {
+                fileInput.click();
+            }, 400);
         }
-    }
-
-    function showFileInput() {
-        fileInput.click();
     }
 
     // Manejar selección de archivo
@@ -93,6 +110,8 @@ document.addEventListener('DOMContentLoaded', function() {
             const photoData = canvas.toDataURL('image/png');
             video.style.display = 'none';
             takePhotoBtn.style.display = 'none';
+            // Mostrar controles de cámara para permitir cambiar
+            document.querySelector('.camera-controls').style.display = 'flex';
             previewImg.src = photoData;
             preview.style.display = 'block';
             btn.style.display = 'block';

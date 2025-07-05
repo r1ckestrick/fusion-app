@@ -172,6 +172,32 @@
             margin-bottom: 18px;
             object-fit: cover;
         }
+        .camera-controls {
+            margin-bottom: 15px;
+            display: flex;
+            gap: 8px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        .camera-option-btn {
+            background: linear-gradient(135deg, #3a2323 0%, #7a4c3a 100%);
+            color: #f5e9e0;
+            border: none;
+            padding: 18px 0;
+            border-radius: 22px;
+            font-size: 1.2em;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin: 10px auto 0 auto;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.25);
+            font-weight: bold;
+            width: 100%;
+            max-width: 340px;
+            letter-spacing: 0.04em;
+            display: block;
+            text-align: center;
+            text-transform: uppercase;
+        }
         .camera-btn {
             width: 70px;
             height: 70px;
@@ -332,6 +358,16 @@
             font-family: 'Bellefair', serif;
             text-transform: uppercase;
         }
+        .logo-together-text {
+            color: #e7dbc7;
+            font-family: 'Cinzel', serif;
+            font-size: 0.8em;
+            text-align: center;
+            text-shadow: 0 2px 8px #000, 0 0px 1px #7a4c3a;
+            margin-top: 10px;
+            margin-bottom: 10px;
+            letter-spacing: 0.04em;
+        }
     </style>
 </head>
 <body>
@@ -344,12 +380,15 @@
             <img src="/static/assets/logotogether.png" alt="TOGETHER">
             <div>14 DE AGOSTO SOLO EN CINES</div>
         </div>
-        <div class="landing-subtitle">Sácate una selfie en el bosque con tu alma gemela y descubre el amor para siempre</div>
+        <div class="landing-subtitle">Sácate una foto en el bosque con tu alma gemela y descubre el amor para siempre</div>
         <button class="landing-btn" id="startBtn">COMENZAR</button>
     </div>
     <div class="container" id="formContainer">
         <div class="main-title">
             <img src="/static/assets/logotogether.png" alt="TOGETHER" style="max-width: 180px; width: 60vw; display: block; margin: 0 auto;">
+            <div class="logo-together-text">
+                14 DE AGOSTO SOLO EN CINES
+            </div>
         </div>
         <p class="subtitle">Tomate una selfie pegado a tu alma gemela y descubre el amor para siempre</p>
         <form id="uploadForm" method="POST" enctype="multipart/form-data">

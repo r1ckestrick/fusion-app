@@ -1,7 +1,7 @@
 import os
 import cv2
 import cv2.data  # Asegura que cv2.data existe
-from PIL import Image, ImageDraw
+from PIL import Image, ImageDraw, ExifTags
 import openai
 import uuid
 from typing import Literal
@@ -73,8 +73,28 @@ def editar_imagen_gpt_image1_sin_mascara(ruta_imagen, prompt):
         f.write(base64.b64decode(b64_img))
     return output_path
 
+def corregir_orientacion_exif(imagen):
+    try:
+        exif = imagen._getexif()
+        if exif is not None:
+            for orientation in ExifTags.TAGS.keys():
+                if ExifTags.TAGS[orientation] == 'Orientation':
+                    break
+            orientation_value = exif.get(orientation, None)
+            if orientation_value == 3:
+                imagen = imagen.rotate(180, expand=True)
+            elif orientation_value == 6:
+                imagen = imagen.rotate(270, expand=True)
+            elif orientation_value == 8:
+                imagen = imagen.rotate(90, expand=True)
+    except Exception as e:
+        pass
+    return imagen
+
 def preparar_imagen_cuadrada(ruta_entrada, ruta_salida, size=1024):
-    img = Image.open(ruta_entrada).convert("RGBA")
+    img = Image.open(ruta_entrada)
+    img = corregir_orientacion_exif(img)
+    img = img.convert("RGBA")
     min_side = min(img.width, img.height)
     left = (img.width - min_side) // 2
     top = (img.height - min_side) // 2
@@ -99,6 +119,19 @@ def componer_inpainting(original_path, generado_path, mask_path, output_path):
     resultado.save(output_path, "PNG")
     return output_path
 
+def superponer_overlay(imagen_path, overlay_path, output_path):
+    base = Image.open(imagen_path).convert("RGBA")
+    overlay = Image.open(overlay_path).convert("RGBA")
+    if overlay.size != base.size:
+        try:
+            resample = Image.Resampling.LANCZOS
+        except AttributeError:
+            resample = 1  # LANCZOS
+        overlay = overlay.resize(base.size, resample)
+    base.alpha_composite(overlay)
+    base.save(output_path, "PNG")
+    return output_path
+
 def fusionar_rostros(input_path: str, prompt: str = "") -> str:
     """
     Fusiona rostros usando OpenAI DALL-E 2
@@ -116,7 +149,7 @@ def fusionar_rostros(input_path: str, prompt: str = "") -> str:
     if not os.path.exists(input_path):
         raise FileNotFoundError(f"Imagen no encontrada: {input_path}")
 
-    prompt = prompt or "In the masked area between both faces, generate a subtle skin deformation, stretching and blending both sides together like organic slime. The fusion should feel organic and slightly surreal, it should look melted together, the rest of the image should be the same as the original"
+    prompt = prompt or "In the masked area between both faces, generate a surreal skin deformation, stretching and blending both sides together like organic slime. The fusion should feel organic and surreal, it should look melted together, the rest of the image should be the same as the original."
 
     # Prepara imagen cuadrada PNG 1024x1024
     cuadrada_path = os.path.join(TEMP_FOLDER, f"cuadrada_{uuid.uuid4().hex}.png")
@@ -127,4 +160,8 @@ def fusionar_rostros(input_path: str, prompt: str = "") -> str:
     if not output_path or not isinstance(output_path, str) or output_path.strip() == "" or not os.path.exists(output_path):
         raise Exception("No se obtuvo una imagen generada")
 
-    return output_path
+    # Superponer overlay del logo
+    overlay_path = os.path.join(os.path.dirname(__file__), "static", "assets", "overlaytogether.png")
+    output_con_logo = output_path.replace(".png", "_logo.png")
+    superponer_overlay(output_path, overlay_path, output_con_logo)
+    return output_con_logo
