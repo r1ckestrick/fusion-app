@@ -120,16 +120,30 @@ def componer_inpainting(original_path, generado_path, mask_path, output_path):
     return output_path
 
 def superponer_overlay(imagen_path, overlay_path, output_path):
-    base = Image.open(imagen_path).convert("RGBA")
+    """
+    Crea un canvas de 1920x1080, centra la imagen generada y superpone el overlay.
+    """
     overlay = Image.open(overlay_path).convert("RGBA")
-    if overlay.size != base.size:
-        try:
-            resample = Image.Resampling.LANCZOS
-        except AttributeError:
-            resample = 1  # LANCZOS
-        overlay = overlay.resize(base.size, resample)
-    base.alpha_composite(overlay)
-    base.save(output_path, "PNG")
+    base_w, base_h = overlay.size  # 1920x1080
+
+    img = Image.open(imagen_path).convert("RGBA")
+    img_w, img_h = img.size
+
+    # Crear canvas base
+    canvas = Image.new("RGBA", (base_w, base_h), (0, 0, 0, 0))
+
+    # Calcular posición centrada
+    x = (base_w - img_w) // 2
+    y = (base_h - img_h) // 2
+
+    # Pegar la imagen generada centrada
+    canvas.paste(img, (x, y), img)
+
+    # Superponer el overlay encima
+    canvas.alpha_composite(overlay)
+
+    # Guardar resultado
+    canvas.save(output_path, "PNG")
     return output_path
 
 def fusionar_rostros(input_path: str, prompt: str = "") -> str:
