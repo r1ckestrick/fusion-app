@@ -98,7 +98,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         navigator.share({
                             files: [file],
                             title: 'Mira nuestra fusión',
-                            text: '¡Mira la imagen que generamos juntos!'
+                            text: '¡Ahora estamos #together para siempre! 💖'
                         }).catch(() => {
                             fallbackDownload();
                         });
