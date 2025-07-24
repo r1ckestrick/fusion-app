@@ -88,6 +88,7 @@
             padding: 10px 0;
             margin-bottom: 30px;
             z-index: 10;
+            padding-bottom: calc(10px + env(safe-area-inset-bottom, 0px));
         }
         .landing-title {
             font-size: 2.8em;
@@ -413,7 +414,7 @@
                 31 DE JULIO SOLO EN CINES
             </div>
         </div>
-        <p class="subtitle">Tomate una selfie pegado a tu alma gemela y descubre el amor para siempre</p>
+        <p class="subtitle">Tomate una selfie <strong>pegado</strong> a tu alma gemela y descubre el amor para siempre</p>
         <form id="uploadForm" method="POST" enctype="multipart/form-data">
             <div class="camera-area" id="cameraArea">
                 <!-- Eliminado video y botón de tomar foto, solo popup de archivo -->
