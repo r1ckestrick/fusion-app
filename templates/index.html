@@ -389,6 +389,17 @@
         overflow-y: hidden;
         height: 100vh;
         }
+        /* --- NUEVO ESTILO PARA LA IMAGEN DE RESULTADO --- */
+        #result-image {
+            max-width: 70%;
+            height: auto;
+            display: block;
+            margin: 0 auto 18px auto;
+            border-radius: 14px;
+            box-shadow: 0 5px 25px rgba(0,0,0,0.45);
+            border: 2.5px solid #3a2323;
+            background: #1a0d0d;
+        }
     </style>
 </head>
 <body>
@@ -431,7 +442,7 @@
             <div>Procesando imagen con IA... Esto puede tomar unos minutos</div>
         </div>
         <div id="result-container" style="display: none;">
-            <img id="result-image" src="" alt="Imagen generada" style="max-width: 100%; height: auto;">
+            <img id="result-image" src="" alt="Imagen generada">
             <button id="share-btn" class="btn" style="display:none;">Compartir</button>
             <button id="trailer-btn" class="btn" style="display:none; margin-top: 12px;">Ver trailer</button>
         </div>
