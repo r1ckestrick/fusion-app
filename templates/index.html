@@ -22,6 +22,8 @@
             overflow-x: hidden;
             background: #181313;
             padding-top: 20px;
+            display: flex;
+            flex-direction: column;
         }
 
         .header-comiccon {
@@ -57,9 +59,7 @@
         }
 
         .landing {
-            position: fixed;
-            top: 0; left: 0; width: 100vw; height: 100vh;
-            z-index: 2;
+            width: 100vw;
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -69,6 +69,7 @@
             font-family: 'Cinzel', serif;
             background: rgba(24, 19, 19, 0.55);
             transition: opacity 0.7s;
+            flex: 1 0 auto;
         }
         .landing.hide {
             opacity: 0;
@@ -443,7 +444,7 @@
             }
         });
     </script>
-    <footer style="width:100vw;display:flex;justify-content:center;align-items:center;position:fixed;left:0;bottom:0;margin:0;padding:10px 0;z-index:100;">
+    <footer style="width:100%;display:flex;justify-content:center;align-items:center;margin-top:40px;margin-bottom:10px;padding:10px 0;z-index:10;">
         <span style="font-family:'Roboto Condensed',Arial,sans-serif;font-size:1em;color:#e7dbc7;letter-spacing:0.04em;">powered by </span>
         <a href="https://elealcubo.cl" target="_blank" rel="noopener noreferrer" style="font-family:'Roboto Mono',monospace;font-size:1em;color:#e7dbc7;margin-left:6px;text-decoration:underline;">elealcubo</a>
     </footer>
